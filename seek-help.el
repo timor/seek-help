@@ -93,7 +93,7 @@ Seek help instead of this."
         (seek-help-refresh-overlays)
         (setq seek-help-idle-timer (run-with-idle-timer 0.5 t 'seek-help--on-timer-event)))
     (seek-help-delete-overlays)
-    (cancel-timer )))
+    (cancel-timer seek-help-idle-timer)))
 
 (provide 'seek-help)
 
