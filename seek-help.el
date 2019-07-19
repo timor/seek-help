@@ -61,10 +61,10 @@
    (overlay-put o 'before-string seek-help--before-string)
    (push o seek-help--overlays)))
 
-(defun seek-help-delete-overlays(&rest ignore)
+(defun seek-help-delete-overlays()
   (loop for o in seek-help--overlays do (delete-overlay o)))
 
-(defun seek-help-refresh-overlays(&rest ignore)
+(defun seek-help-refresh-overlays()
   (seek-help-delete-overlays)
   (setq seek-help--overlays '())
   (save-excursion
