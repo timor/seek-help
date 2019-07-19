@@ -72,6 +72,12 @@
     (while (re-search-forward seek-help--closing-regexp nil t)
       (seek-help--make-overlay (match-beginning 1) (match-end 1)))))
 
+(defun seek-help--on-timer-event()
+  (when seek-help-mode
+      (seek-help-refresh-overlays)))
+
+(defvar seek-help--idle-timer)
+
 (define-minor-mode seek-help-mode
   "Toggle insane Bracing style overlays.
 Seek help instead of this."
@@ -79,9 +85,9 @@ Seek help instead of this."
   (if seek-help-mode
       (progn
         (seek-help-refresh-overlays)
-        (add-hook 'after-change-functions 'seek-help-refresh-overlays))
+        (setq seek-help-idle-timer (run-with-idle-timer 0.5 t 'seek-help--on-timer-event)))
     (seek-help-delete-overlays)
-    (remove-hook 'after-change-functions 'seek-help-refresh-overlays)))
+    (cancel-timer )))
 
 (provide 'seek-help)
 
