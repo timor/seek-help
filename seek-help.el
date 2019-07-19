@@ -36,6 +36,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'rx)
+
 (defvar seek-help--before-string (propertize " " 'display '(space :align-to (- right-margin 8))))
 (defvar seek-help--closing-regexp
   (rx bol (* space)
