@@ -70,7 +70,10 @@
       (seek-help--make-overlay (match-beginning 1) (match-end 1)))
     (goto-char (point-min))
     (while (re-search-forward seek-help--closing-regexp nil t)
-      (seek-help--make-overlay (match-beginning 1) (match-end 1)))))
+      (seek-help--make-overlay (match-beginning 1) (match-end 1))))
+    (goto-char (point-min))
+    (while (re-search-forward (rx ";" eol) nil t)
+      (seek-help--make-overlay (match-beginning 0) (match-end 0))))
 
 (defun seek-help--on-timer-event()
   (when seek-help-mode
