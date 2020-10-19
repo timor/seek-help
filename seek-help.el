@@ -2,7 +2,7 @@
 
 ;; Author: timor
 ;; Maintainer: timor
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ()
 ;; Homepage: homepage
 ;; Keywords:
@@ -62,28 +62,29 @@
    (push o seek-help--overlays)))
 
 (defun seek-help-delete-overlays()
-  (loop for o in seek-help--overlays do (delete-overlay o)))
+  (save-excursion (loop for o in seek-help--overlays do (delete-overlay o))))
 
 (defun seek-help-refresh-overlays()
-  (seek-help-delete-overlays)
-  (setq seek-help--overlays '())
   (save-excursion
+    (seek-help-delete-overlays)
+    (setq seek-help--overlays '())
     (goto-char (point-min))
     (while (re-search-forward seek-help--opening-regexp nil t)
       (seek-help--make-overlay (match-beginning 1) (match-end 1)))
     (goto-char (point-min))
     (while (re-search-forward seek-help--closing-regexp nil t)
-      (seek-help--make-overlay (match-beginning 1) (match-end 1))))
+      (seek-help--make-overlay (match-beginning 1) (match-end 1)))
     (goto-char (point-min))
     (while (re-search-forward (rx ";" eol) nil t)
-      (seek-help--make-overlay (match-beginning 0) (match-end 0))))
+      (seek-help--make-overlay (match-beginning 0) (match-end 0)))))
 
-(defun seek-help--on-timer-event()
+;; This would be the place to be clever about rebuilding the overlays instead of
+;; brute-forcing everything every time!
+(defun seek-help--after-change-hook(beg end len)
   (when seek-help-mode
-      (seek-help-refresh-overlays)))
+    (seek-help-refresh-overlays)))
 
-(defvar seek-help--idle-timer)
-
+;;;###autoload
 (define-minor-mode seek-help-mode
   "Toggle insane Bracing style overlays.
 Seek help instead of this."
@@ -91,9 +92,10 @@ Seek help instead of this."
   (if seek-help-mode
       (progn
         (seek-help-refresh-overlays)
-        (setq seek-help-idle-timer (run-with-idle-timer 0.5 t 'seek-help--on-timer-event)))
-    (seek-help-delete-overlays)
-    (cancel-timer seek-help-idle-timer)))
+        (add-hook 'after-change-functions 'seek-help--after-change-hook t t)
+        )
+    (progn (seek-help-delete-overlays)
+           (remove-hook 'after-change-functions 'seek-help--after-change-hook t))))
 
 (provide 'seek-help)
 
